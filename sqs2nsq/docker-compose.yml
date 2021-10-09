@@ -1,0 +1,58 @@
+version: '3.0'
+
+services:
+  localstack:
+    image: localstack/localstack:latest
+    environment:
+      - AWS_DEFAULT_REGION=us-east-2
+      - EDGE_PORT=4566
+      - SERVICES=sqs
+    ports:
+      - '4566:4566'
+  nsqlookup:
+    image: nsqio/nsq
+    hostname: nsqlookup
+    ports:
+      - '4160:4160'
+      - '4161:4161'
+    command: /nsqlookupd
+  nsq:
+    image: nsqio/nsq
+    hostname: nsq
+    ports:
+      - '4150:4150'
+      - '4151:4151'
+    links:
+      - nsqlookup:nsqlookup
+    command: /nsqd --broadcast-address nsq --lookupd-tcp-address=nsqlookup:4160
+  nsqadmin:
+    image: nsqio/nsq
+    hostname: nsqadmin
+    links:
+      - nsqlookup:nsqlookup
+    ports:
+      - "4171:4171"
+    command: /nsqadmin --lookupd-http-address=nsqlookup:4161
+  producer:
+    build:
+      context: ../producer
+    environment:
+      - URL=http://localstack:4566/000000000000/sqs2nsq
+      - ENDPOINT=http://localstack:4566
+  sqs2nsq:
+    image: chaseisabelle/sqs2nsq:latest
+    environment:
+      - TO=nsq:4150
+      - TOPIC=sqs2nsq
+      - WORKERS=1
+      - BACKOFF=250
+      - AWS_ID=
+      - AWS_KEY=
+      - AWS_SECRET=
+      - AWS_REGION=us-east-2
+      - QUEUE_URL=http://localstack:4566/000000000000/sqs2nsq
+      - QUEUE_NAME=
+      - QUEUE_ENDPOINT=http://localstack:4566
+      - MAX_RETRIES=0
+      - VISIBILITY_TIMEOUT=30
+      - WAIT_TIME=5

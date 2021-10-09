@@ -1,0 +1,30 @@
+version: '3.0'
+
+services:
+  localstack:
+    image: localstack/localstack:latest
+    environment:
+      - AWS_DEFAULT_REGION=us-east-2
+      - EDGE_PORT=4566
+      - SERVICES=sqs
+    ports:
+      - '4566:4566'
+  sqs2sqs:
+    image: chaseisabelle/sqs2sqs:latest
+    environment:
+      - PRODUCER_URL=http://localstack:4566/000000000000/sqs2sqs
+      - PRODUCER_ENDPOINT=http://localstack:4566
+      - PRODUCER_REGION=us-east-2
+      - PRODUCER_DELAY=0
+      - WORKERS=1
+      - BACKOFF=250
+      - AWS_ID=
+      - AWS_KEY=
+      - AWS_SECRET=
+      - AWS_REGION=us-east-2
+      - QUEUE_URL=http://localstack:4566/000000000000/sqs2sqs
+      - QUEUE_NAME=
+      - QUEUE_ENDPOINT=http://localstack:4566
+      - MAX_RETRIES=0
+      - VISIBILITY_TIMEOUT=30
+      - WAIT_TIME=5
