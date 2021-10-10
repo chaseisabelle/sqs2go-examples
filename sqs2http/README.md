@@ -1,4 +1,4 @@
-#sqs2nothing example
+#sqs2http example
 
 usage
 - `make redo` - destroy, rebuild, run

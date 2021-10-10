@@ -10,7 +10,7 @@ logs:
 qup:
 	docker-compose up -d --remove-orphans localstack
 	sleep 10
-	docker run --rm -it -v $(shell pwd)/../.aws:/root/.aws amazon/aws-cli --region=us-east-2 --endpoint-url=http://host.docker.internal:4566 sqs create-queue --queue-name sqs2nothing
+	docker run --rm -it -v $(shell pwd)/../.aws:/root/.aws amazon/aws-cli --region=us-east-2 --endpoint-url=http://host.docker.internal:4566 sqs create-queue --queue-name sqs2http
 
 qls:
 	docker run --rm -it -v $(shell pwd)/../.aws:/root/.aws amazon/aws-cli --region=us-east-2 --endpoint-url=http://host.docker.internal:4566 sqs list-queues
@@ -28,10 +28,10 @@ rm:
 	docker-compose rm -f
 
 rmi:
-	docker rmi -f chaseisabelle/sqs2nothing
+	docker rmi -f chaseisabelle/sqs2http sqs2http_web
 
 pull:
-	docker pull chaseisabelle/sqs2nothing
+	docker pull chaseisabelle/sqs2http
 
 nuke:
 	make stop && make rm && make rmi

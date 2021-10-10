@@ -13,18 +13,27 @@ services:
     build:
       context: ../producer
     environment:
-      - URL=http://localstack:4566/000000000000/sqs2nothing
+      - URL=http://localstack:4566/000000000000/sqs2http
       - ENDPOINT=http://localstack:4566
-  sqs2nothing:
-    image: chaseisabelle/sqs2nothing:latest
+  web:
+    build:
+      context: .
+    ports:
+      - '8080:80'
+    volumes:
+      - '.:/app'
+  sqs2http:
+    image: chaseisabelle/sqs2http:latest
     environment:
+      - TO=http://web:8080/sqs2http
+      - METHOD=POST
       - WORKERS=1
       - BACKOFF=250
       - AWS_ID=
       - AWS_KEY=
       - AWS_SECRET=
       - AWS_REGION=us-east-2
-      - QUEUE_URL=http://localstack:4566/000000000000/sqs2nothing
+      - QUEUE_URL=http://localstack:4566/000000000000/sqs2http
       - QUEUE_NAME=
       - QUEUE_ENDPOINT=http://localstack:4566
       - MAX_RETRIES=0
